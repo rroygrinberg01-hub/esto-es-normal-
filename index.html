@@ -19,6 +19,134 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
 
+  <script>
+  // Lista de respuestas y consejos
+  const messages = {
+    es: {
+      responses: {
+        common:["Sentir esto es común. Establecer límites ayuda a reducir estrés y mantener equilibrio."],
+        warning:["Esto puede ser preocupante, pero hay formas de manejarlo de manera saludable."],
+        alert:["Situación seria. Buscá ayuda profesional inmediatamente."]
+      },
+      advice: {
+        common:[
+          "Comunicá tus horarios disponibles; esto reduce ansiedad y mejora la comunicación.",
+          "Silenciá notificaciones fuera de horario; desconectarte ayuda a tu bienestar.",
+          "Tomá pausas de autocuidado; pequeñas actividades reducen estrés y mejoran ánimo.",
+          "Recordá que es algo común; muchas personas sienten lo mismo.",
+          "Organizá tus tareas y prioridades; te da sensación de control y tranquilidad."
+        ],
+        warning:["Explorá técnicas de manejo de estrés y apoyo social."],
+        alert:["Contactá línea de ayuda o profesional inmediatamente."]
+      }
+    },
+    en: {
+      responses: {
+        common:["Feeling this is common. Setting boundaries helps reduce stress and maintain balance."],
+        warning:["This could be concerning, but there are healthy ways to handle it."],
+        alert:["Serious situation. Seek professional help immediately."]
+      },
+      advice: {
+        common:[
+          "Communicate your available hours; this reduces anxiety and improves communication.",
+          "Mute notifications outside work; disconnecting helps your wellbeing.",
+          "Take small self-care breaks; activities reduce stress and improve mood.",
+          "Remember it's common; many people feel the same.",
+          "Organize your tasks and priorities; it gives you control and calm."
+        ],
+        warning:["Explore stress management techniques and social support."],
+        alert:["Contact a helpline or professional immediately."]
+      }
+    },
+    pt: {
+      responses: {
+        common:["Sentir isso é comum. Estabelecer limites ajuda a reduzir o estresse e manter o equilíbrio."],
+        warning:["Isso pode ser preocupante, mas há maneiras saudáveis de lidar com isso."],
+        alert:["Situação séria. Procure ajuda profissional imediatamente."]
+      },
+      advice: {
+        common:[
+          "Comunique seus horários disponíveis; isso reduz a ansiedade e melhora a comunicação.",
+          "Silencie notificações fora do horário; desconectar ajuda no bem-estar.",
+          "Faça pequenas pausas de autocuidado; atividades reduzem o estresse e melhoram o humor.",
+          "Lembre-se que é algo comum; muitas pessoas sentem o mesmo.",
+          "Organize suas tarefas e prioridades; dá sensação de controle e tranquilidade."
+        ],
+        warning:["Explore técnicas de gerenciamento de estresse e apoio social."],
+        alert:["Entre em contato com uma linha de ajuda ou profissional imediatamente."]
+      }
+    }
+    // Podés agregar los demás idiomas siguiendo el mismo patrón
+  };
+
+  let adviceIndex = 0;
+  let currentAdviceList = [];
+
+  function analyze() {
+    const input = document.getElementById("input").value.trim();
+    if(!input) return;
+
+    const lang = document.getElementById("language").value;
+    const { responses, advice } = messages[lang] || messages["es"];
+    const resultBox = document.getElementById("result");
+    const tag = document.getElementById("tag");
+    const resources = document.getElementById("resources");
+    const adviceBox = document.getElementById("advice");
+    const nextBtn = document.getElementById("nextAdvice");
+    const showAllBtn = document.getElementById("showAllAdvice");
+    const adviceListEl = document.getElementById("adviceList");
+
+    // Ocultar resultado antes de mostrar
+    resultBox.style.display = "none";
+
+    setTimeout(() => {
+      // Determinar nivel
+      let level = "common";
+      const alertKeywords = ["suicidio","matarme","daño"];
+      if(alertKeywords.some(k => input.toLowerCase().includes(k))) level="alert";
+      else if(input.toLowerCase().includes("ansiedad") || input.toLowerCase().includes("miedo")) level="warning";
+
+      // Mostrar mensaje
+      const msg = responses[level][Math.floor(Math.random()*responses[level].length)];
+      tag.className = "tag " + level;
+      const emojis = {common:'✅', warning:'⚠️', alert:'🔴'};
+      tag.textContent = emojis[level] + " " + msg;
+
+      // Recursos
+      resources.innerHTML = level==='alert' ? (lang==='es' ? "Contactá una línea de ayuda local según tu país." : "Contact a local helpline immediately.") : "";
+
+      // Mostrar consejos
+      currentAdviceList = advice[level];
+      adviceIndex = 0;
+      adviceBox.textContent = currentAdviceList[adviceIndex];
+      nextBtn.style.display = "inline-block";
+      showAllBtn.style.display = "inline-block";
+      adviceListEl.style.display = "none";
+
+      resultBox.style.display = "block";
+    }, 3000);
+  }
+
+  // Botones de siguiente y ver todos
+  document.getElementById("nextAdvice").addEventListener("click", () => {
+    adviceIndex++;
+    const adviceBox = document.getElementById("advice");
+    if(adviceIndex >= currentAdviceList.length) adviceIndex = 0;
+    adviceBox.textContent = currentAdviceList[adviceIndex];
+  });
+
+  document.getElementById("showAllAdvice").addEventListener("click", () => {
+    const adviceListEl = document.getElementById("adviceList");
+    adviceListEl.innerHTML = "";
+    currentAdviceList.forEach(a => {
+      const li = document.createElement("li");
+      li.textContent = a;
+      adviceListEl.appendChild(li);
+    });
+    adviceListEl.style.display = "block";
+  });
+</script>
+
   <style>
     body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #f0f4ff, #ffffff); color: #111; display: flex; justify-content: center; padding: 40px 16px; transition: background 0.5s; }
     .container { max-width: 700px; width: 100%; background: white; padding: 32px 48px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.12); transition: transform 0.3s; position: relative; }
@@ -118,4 +246,5 @@
   </script>
 </body>
 </html>
+
 
