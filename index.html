@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Esto es normal?</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #f0f4ff, #ffffff); color: #111; display: flex; justify-content: center; padding: 40px 16px; transition: background 0.5s; }
+    .container { max-width: 700px; width: 100%; background: white; padding: 32px 48px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.12); transition: transform 0.3s; position: relative; }
+    .container:hover { transform: translateY(-3px); }
+    h1 { font-family: 'Montserrat', sans-serif; font-size: 2.8rem; margin-bottom: 8px; text-align: center; }
+    p.subtitle { color: #555; margin-bottom: 24px; font-size: 1.2rem; text-align: center; font-style: italic; }
+    textarea { width: 100%; height: 120px; padding: 14px; font-size: 1rem; border-radius: 12px; border: 1px solid #ccc; resize: none; transition: border-color 0.3s; font-family: 'Roboto', sans-serif; }
+    textarea:focus { border-color: #2563eb; outline: none; }
+    button { margin-top: 18px; width: 100%; padding: 14px; font-size: 1rem; background: #2563eb; color: white; border: none; border-radius: 12px; cursor: pointer; transition: background 0.3s; font-family: 'Montserrat', sans-serif; font-weight: 600; }
+    button:hover { background: #1e40af; }
+    select { width: 100%; margin-top: 10px; padding: 10px; border-radius: 12px; border: 1px solid #ccc; font-size: 1rem; font-family: 'Roboto', sans-serif; }
+    .result { margin-top: 28px; padding: 22px; border-radius: 14px; background: #f1f5f9; display: none; animation: fadeIn 0.6s ease; }
+    @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+    .tag { font-weight: bold; margin-bottom: 12px; font-size: 1.3rem; }
+    .common { color: #16a34a; } .warning { color: #eab308; } .alert { color: #dc2626; }
+    .resources { margin-top: 14px; font-size: 0.95rem; color: #444; }
+    .advice { margin-top: 12px; font-size: 1rem; font-style: italic; color: #1f2937; }
+    .share-copy { margin-top: 12px; display: flex; gap: 8px; }
+    .share-copy button { flex: 1; padding: 10px; font-size: 0.95rem; border-radius: 10px; border: none; cursor: pointer; background: #111; color: white; transition: background 0.3s; }
+    .share-copy button:hover { background: #000; }
+    footer { margin-top: 36px; font-size: 0.8rem; color: #666; text-align: center; }
+    .side-panel { position: absolute; top: 0; bottom: 0; width: 40px; background: #ffffff; border-radius: 16px 0 0 16px; }
+    .side-panel.right { right: -40px; border-radius: 0 16px 16px 0; }
+    .advice-list { display: none; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="side-panel"></div>
+  <div class="side-panel right"></div>
+
+  <div class="container" id="container">
+    <h1 id="mainTitle">¿Esto es normal?</h1>
+    <p class="subtitle" id="subtitle">Situaciones reales. Contexto humano colectivo.</p>
+
+    <select id="language" onchange="updateLanguage()">
+      <option value="es">Español</option>
+      <option value="en">English</option>
+      <option value="pt">Português</option>
+      <option value="hi">हिंदी</option>
+      <option value="ar">العربية</option>
+      <option value="fr">Français</option>
+      <option value="ru">Русский</option>
+      <option value="zh">中文</option>
+      <option value="it">Italiano</option>
+    </select>
+
+    <textarea id="input" placeholder=""></textarea>
+    <button id="analyzeBtn" onclick="analyze()">Analizar</button>
+
+    <div id="result" class="result">
+      <div id="tag" class="tag"></div>
+      <div class="resources" id="resources"></div>
+      <div class="advice" id="advice"></div>
+      <button id="nextAdvice" style="margin-top:10px; display:none;"></button>
+      <button id="showAllAdvice" style="margin-top:10px; display:none;"></button>
+      <ul id="adviceList" class="advice-list"></ul>
+      <div class="share-copy">
+        <button id="copyResultBtn"></button>
+        <button id="shareLinkBtn"></button>
+      </div>
+    </div>
+
+    <footer id="footer">Esto no reemplaza ayuda profesional. Si estás en peligro inmediato, buscá asistencia local.</footer>
+  </div>
+
+  <script>
+    const languageTitles = {
+      es:'¿Esto es normal?', en:'Is this normal?', pt:'Isso é normal?', hi:'क्या यह सामान्य है?', ar:'هل هذا طبيعي؟', fr:'Est-ce normal ?', ru:'Это нормально?', zh:'这正常吗？', it:'È normale?'
+    };
+
+    const uiText = {
+      es:{subtitle:'Situaciones reales. Contexto humano colectivo.', analyzeBtn:'Analizar', nextAdvice:'¿Querés otro consejo?', showAllAdvice:'Ver todos los consejos', copyResult:'Copiar resultado', shareLink:'Compartir con familia, amigos o quien necesite saberlo', footer:'Esto no reemplaza ayuda profesional. Si estás en peligro inmediato, buscá asistencia local.', placeholder:'Escribí tu respuesta aquí...'},
+      en:{subtitle:'Real situations. Human collective context.', analyzeBtn:'Analyze', nextAdvice:'Want another advice?', showAllAdvice:'See all advice', copyResult:'Copy result', shareLink:'Share with family, friends, or anyone who needs it', footer:'This does not replace professional help. If you are in immediate danger, seek local assistance.', placeholder:'Write your answer here...'},
+      pt:{subtitle:'Situações reais. Contexto humano coletivo.', analyzeBtn:'Analisar', nextAdvice:'Quer outro conselho?', showAllAdvice:'Ver todos os conselhos', copyResult:'Copiar resultado', shareLink:'Compartilhar com família, amigos ou quem precisar', footer:'Isso não substitui ajuda profissional. Se estiver em perigo imediato, procure assistência local.', placeholder:'Escreva sua resposta aqui...'},
+      hi:{subtitle:'वास्तविक स्थितियाँ। मानव सामूहिक संदर्भ।', analyzeBtn:'विश्लेषण करें', nextAdvice:'एक और सुझाव चाहिए?', showAllAdvice:'सभी सुझाव देखें', copyResult:'परिणाम कॉपी करें', shareLink:'परिवार, दोस्तों या जरूरतमंद के साथ साझा करें', footer:'यह पेशेवर सहायता का विकल्प नहीं है। अगर आप तत्काल खतरे में हैं, तो स्थानीय सहायता प्राप्त करें।', placeholder:'अपना जवाब यहाँ लिखें...'},
+      ar:{subtitle:'مواقف حقيقية. سياق جماعي بشري.', analyzeBtn:'تحليل', nextAdvice:'هل تريد نصيحة أخرى؟', showAllAdvice:'عرض كل النصائح', copyResult:'نسخ النتيجة', shareLink:'شارك مع العائلة، الأصدقاء أو من يحتاج', footer:'هذا لا يغني عن المساعدة المهنية. إذا كنت في خطر فوري، اطلب المساعدة المحلية.', placeholder:'اكتب إجابتك هنا...'},
+      fr:{subtitle:'Situations réelles. Contexte collectif humain.', analyzeBtn:'Analyser', nextAdvice:'Voulez-vous un autre conseil?', showAllAdvice:'Voir tous les conseils', copyResult:'Copier le résultat', shareLink:'Partager avec la famille, amis ou toute personne dans le besoin', footer:'Cela ne remplace pas l’aide professionnelle. Si vous êtes en danger immédiat, cherchez une assistance locale.', placeholder:'Écrivez votre réponse ici...'},
+      ru:{subtitle:'Реальные ситуации. Коллективный человеческий контекст.', analyzeBtn:'Анализировать', nextAdvice:'Хотите еще совет?', showAllAdvice:'Показать все советы', copyResult:'Скопировать результат', shareLink:'Поделиться с семьей, друзьями или нуждающимися', footer:'Это не заменяет профессиональную помощь. Если вы в опасности, обратитесь за местной помощью.', placeholder:'Напишите ваш ответ здесь...'},
+      zh:{subtitle:'真实情况。人类集体背景。', analyzeBtn:'分析', nextAdvice:'想要另一个建议吗？', showAllAdvice:'查看所有建议', copyResult:'复制结果', shareLink:'与家人、朋友或需要的人分享', footer:'这不能替代专业帮助。如果您处于即时危险中，请寻求当地援助。', placeholder:'在此输入您的回答...'},
+      it:{subtitle:'Situazioni reali. Contesto umano collettivo.', analyzeBtn:'Analizza', nextAdvice:'Vuoi un altro consiglio?', showAllAdvice:'Vedi tutti i consigli', copyResult:'Copia risultato', shareLink:'Condividi con famiglia, amici o chi ne ha bisogno', footer:'Questo non sostituisce l’aiuto professionale. Se sei in pericolo immediato, cerca assistenza locale.', placeholder:'Scrivi qui la tua risposta...'}
+    };
+
+    function updateLanguage(){
+      const lang=document.getElementById('language').value;
+      document.getElementById('mainTitle').textContent=languageTitles[lang];
+      document.getElementById('subtitle').textContent=uiText[lang].subtitle;
+      document.getElementById('analyzeBtn').textContent=uiText[lang].analyzeBtn;
+      document.getElementById('nextAdvice').textContent=uiText[lang].nextAdvice;
+      document.getElementById('showAllAdvice').textContent=uiText[lang].showAllAdvice;
+      document.getElementById('copyResultBtn').textContent=uiText[lang].copyResult;
+      document.getElementById('shareLinkBtn').textContent=uiText[lang].shareLink;
+      document.getElementById('footer').textContent=uiText[lang].footer;
+      document.getElementById('input').placeholder=uiText[lang].placeholder;
+    }
+
+    updateLanguage();
+  </script>
+</body>
+</html>
